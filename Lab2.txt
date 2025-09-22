@@ -1,0 +1,384 @@
+DROP TABLE IF EXISTS Passengers, Airline, Airport, Flights, Booking, Baggage_check, Baggage, Boarding_pass, Booking_flight, Security_check;
+
+CREATE TABLE Passengers(
+passenger_id int PRIMARY KEY,
+first_name varchar(50) NOT NULL,
+last_name varchar(50) NOT NULL,
+date_of_birth date NOT NULL,
+gender varchar(50) NOT NULL,
+country_of_citizenship varchar(50) NOT NULL,
+country_of_residence varchar(50) NOT NULL,
+passport_number varchar(20) NOT NULL,
+created_at timestamp NOT NULL,
+updated_at timestamp NOT NULL
+);
+
+CREATE TABLE Airline_info(
+airline_id integer PRIMARY KEY,
+airline_code varchar (30),
+airline_name varchar(50),
+airline_country varchar(50) NOT NULL,
+created_at timestamp NOT NULL,
+updated_at timestamp NOT NULL,
+info varchar(50) NOT NULL
+);
+
+CREATE TABLE Airport(
+airport_id int PRIMARY KEY,
+airport_name varchar(50),
+country varchar(50) NOT NULL,
+state varchar(50) NOT NULL,
+city varchar(50) NOT NULL,
+created_at timestamp NOT NULL,
+updated_at timestamp NOT NULL
+);
+
+CREATE TABLE Flights(
+flight_id int PRIMARY KEY,
+sch_departure_time timestamp NOT NULL,
+sch_arrival_time timestamp NOT NULL,
+departing_airport_id int NOT NULL,
+arriving_airport_id int NOT NULL,
+departing_gate varchar(50) NOT NULL,
+arriving_gate varchar(50) NOT NULL,
+airline_id int NOT NULL,
+act_departure_time timestamp NOT NULL,
+act_arrival_time timestamp NOT NULL,
+created_at timestamp NOT NULL,
+updated_at timestamp NOT NULL,
+FOREIGN KEY (departing_airport_id) REFERENCES Airport (airport_id),
+FOREIGN KEY (arriving_airport_id) REFERENCES Airport (airport_id),
+FOREIGN KEY (airline_id) REFERENCES Airline_info (airline_id)
+);
+
+CREATE TABLE Booking(
+booking_id int PRIMARY KEY,
+flight_id int NOT NULL,
+passenger_id int NOT NULL,
+booking_platform varchar(50) NOT NULL,
+created_at timestamp NOT NULL,
+updated_at timestamp NOT NULL,
+status varchar(50) NOT NULL,
+price decimal(7,2) NOT NULL,
+FOREIGN KEY (passenger_id) REFERENCES Passengers (passenger_id)
+);
+
+CREATE TABLE Baggage_check(
+baggage_check_id int PRIMARY KEY,
+check_result varchar(50) NOT NULL,
+created_at timestamp NOT NULL,
+updated_at timestamp NOT NULL,
+booking_id int NOT NULL,
+passenger_id int NOT NULL,
+FOREIGN KEY (passenger_id) REFERENCES Passengers (passenger_id),
+FOREIGN KEY (booking_id) REFERENCES Booking (booking_id)
+);
+
+CREATE TABLE Baggage(
+baggage_id int PRIMARY KEY,
+weight_in_kg decimal(4,2) NOT NULL,
+created_at timestamp NOT NULL,
+updated_at timestamp NOT NULL,
+booking_id int NOT NULL,
+FOREIGN KEY (booking_id) REFERENCES Booking (booking_id)
+);
+
+CREATE TABLE Boarding_pass(
+boarding_pass_id int PRIMARY KEY,
+booking_id int NOT NULL,
+seat varchar(50) NOT NULL,
+boarding_time timestamp NOT NULL,
+created_at timestamp NOT NULL,
+updated_at timestamp NOT NULL,
+FOREIGN KEY (booking_id) REFERENCES Booking (booking_id)
+);
+
+CREATE TABLE Booking_flight(
+booking_flight_id int PRIMARY KEY,
+booking_id int NOT NULL,
+flight_id int NOT NULL,
+created_at timestamp NOT NULL,
+updated_at timestamp NOT NULL,
+FOREIGN KEY (booking_id) REFERENCES Booking (booking_id),
+FOREIGN KEY (flight_id) REFERENCES Flights (flight_id)
+);
+
+CREATE TABLE Security_check(
+security_check_id int PRIMARY KEY,
+check_result varchar(20) NOT NULL,
+created_at timestamp NOT NULL,
+updated_at timestamp NOT NULL,
+passenger_id int NOT NULL,
+FOREIGN KEY (passenger_id) REFERENCES Passengers (passenger_id)
+);
+
+----------------
+
+ALTER TABLE Airline_info RENAME TO Airline;
+ALTER TABLE Booking RENAME COLUMN price TO ticket_price;
+ALTER TABLE Flights ALTER COLUMN departing_gate TYPE text;
+ALTER TABLE Airline DROP COLUMN info;
+
+----------------
+
+-- ==============================
+-- Airline (5 rows)
+-- ==============================
+INSERT INTO Airline (airline_id, airline_code, airline_name, airline_country, created_at, updated_at)
+VALUES
+(1,'AA','American Airlines','USA',NOW(),NOW()),
+(2,'BA','British Airways','UK',NOW(),NOW()),
+(3,'AF','Air France','France',NOW(),NOW()),
+(4,'LH','Lufthansa','Germany',NOW(),NOW()),
+(5,'SU','Aeroflot','Russia',NOW(),NOW());
+
+-- ==============================
+-- Airport (10 rows)
+-- ==============================
+INSERT INTO Airport (airport_id, airport_name, country, state, city, created_at, updated_at)
+VALUES
+(1,'JFK International','USA','NY','New York',NOW(),NOW()),
+(2,'Heathrow','UK','London','London',NOW(),NOW()),
+(3,'Charles de Gaulle','France','Ile-de-France','Paris',NOW(),NOW()),
+(4,'Frankfurt Main','Germany','Hesse','Frankfurt',NOW(),NOW()),
+(5,'Sheremetyevo','Russia','Moscow','Moscow',NOW(),NOW()),
+(6,'Haneda','Japan','Tokyo','Tokyo',NOW(),NOW()),
+(7,'Changi','Singapore','Singapore','Singapore',NOW(),NOW()),
+(8,'Dubai International','UAE','Dubai','Dubai',NOW(),NOW()),
+(9,'Los Angeles Intl','USA','CA','Los Angeles',NOW(),NOW()),
+(10,'Beijing Capital','China','Beijing','Beijing',NOW(),NOW());
+
+-- ==============================
+-- Passengers (30 rows)
+-- ==============================
+INSERT INTO Passengers (passenger_id, first_name, last_name, date_of_birth, gender, country_of_citizenship, country_of_residence, passport_number, created_at, updated_at)
+VALUES
+(1,'John','Smith','1985-03-12','Male','USA','USA','US12345',NOW(),NOW()),
+(2,'Alice','Johnson','1990-07-22','Female','UK','UK','UK67890',NOW(),NOW()),
+(3,'Pierre','Dubois','1982-11-05','Male','France','France','FR11223',NOW(),NOW()),
+(4,'Anna','Müller','1975-01-30','Female','Germany','Germany','DE44556',NOW(),NOW()),
+(5,'Ivan','Petrov','1988-06-14','Male','Russia','Russia','RU77889',NOW(),NOW()),
+(6,'Hiroshi','Tanaka','1992-09-09','Male','Japan','Japan','JP33445',NOW(),NOW()),
+(7,'Mei','Wang','1995-02-17','Female','China','China','CN66778',NOW(),NOW()),
+(8,'Mohammed','Al-Farsi','1980-04-25','Male','UAE','UAE','AE99001',NOW(),NOW()),
+(9,'Sophia','Garcia','1993-05-12','Female','Spain','Spain','ES55221',NOW(),NOW()),
+(10,'Liam','Brown','1987-08-18','Male','USA','Canada','CA99887',NOW(),NOW()),
+(11,'Emily','Davis','1991-03-10','Female','USA','USA','US99881',NOW(),NOW()),
+(12,'Daniel','Wilson','1989-12-01','Male','UK','UK','UK44219',NOW(),NOW()),
+(13,'Olga','Ivanova','1986-06-07','Female','Russia','Russia','RU32145',NOW(),NOW()),
+(14,'Yuki','Sato','1994-11-20','Female','Japan','Japan','JP22331',NOW(),NOW()),
+(15,'Wei','Zhang','1981-07-14','Male','China','China','CN11881',NOW(),NOW()),
+(16,'Fatima','Hassan','1990-01-05','Female','UAE','UAE','AE67220',NOW(),NOW()),
+(17,'Carlos','Martinez','1983-10-16','Male','Spain','Spain','ES78123',NOW(),NOW()),
+(18,'Oliver','Taylor','1979-09-28','Male','UK','UK','UK99114',NOW(),NOW()),
+(19,'Isabella','Lopez','1992-04-04','Female','Mexico','Mexico','MX55661',NOW(),NOW()),
+(20,'Noah','Anderson','1996-08-13','Male','USA','USA','US77882',NOW(),NOW()),
+(21,'Mia','Thomas','1991-12-22','Female','Canada','Canada','CA33991',NOW(),NOW()),
+(22,'Lucas','Moore','1985-05-05','Male','Germany','Germany','DE44220',NOW(),NOW()),
+(23,'Emma','Taylor','1993-02-02','Female','UK','UK','UK56712',NOW(),NOW()),
+(24,'David','Martin','1984-03-11','Male','France','France','FR88123',NOW(),NOW()),
+(25,'Natalia','Popova','1990-10-30','Female','Russia','Russia','RU99442',NOW(),NOW()),
+(26,'Akira','Yamamoto','1987-07-19','Male','Japan','Japan','JP44223',NOW(),NOW()),
+(27,'Chen','Li','1995-06-01','Male','China','China','CN67229',NOW(),NOW()),
+(28,'Layla','Khan','1992-01-23','Female','UAE','UAE','AE11993',NOW(),NOW()),
+(29,'Diego','Gomez','1988-09-17','Male','Spain','Spain','ES55290',NOW(),NOW()),
+(30,'Grace','White','1994-12-12','Female','USA','USA','US88119',NOW(),NOW());
+
+-- ==============================
+-- Flights (10 rows)
+-- ==============================
+INSERT INTO Flights (flight_id, sch_departure_time, sch_arrival_time, departing_airport_id, arriving_airport_id, departing_gate, arriving_gate, airline_id, act_departure_time, act_arrival_time, created_at, updated_at)
+VALUES
+(1,NOW(),NOW() + interval '7 hours',1,2,'A1','B2',1,NOW(),NOW() + interval '7 hours',NOW(),NOW()),
+(2,NOW(),NOW() + interval '6 hours',2,3,'B1','C2',2,NOW(),NOW() + interval '6 hours',NOW(),NOW()),
+(3,NOW(),NOW() + interval '2 hours',3,4,'C1','D2',3,NOW(),NOW() + interval '2 hours',NOW(),NOW()),
+(4,NOW(),NOW() + interval '9 hours',4,5,'D1','E2',4,NOW(),NOW() + interval '9 hours',NOW(),NOW()),
+(5,NOW(),NOW() + interval '8 hours',5,6,'E1','F2',5,NOW(),NOW() + interval '8 hours',NOW(),NOW()),
+(6,NOW(),NOW() + interval '3 hours',6,7,'F1','G2',1,NOW(),NOW() + interval '3 hours',NOW(),NOW()),
+(7,NOW(),NOW() + interval '12 hours',7,8,'G1','H2',2,NOW(),NOW() + interval '12 hours',NOW(),NOW()),
+(8,NOW(),NOW() + interval '11 hours',8,9,'H1','I2',3,NOW(),NOW() + interval '11 hours',NOW(),NOW()),
+(9,NOW(),NOW() + interval '10 hours',9,10,'I1','J2',4,NOW(),NOW() + interval '10 hours',NOW(),NOW()),
+(10,NOW(),NOW() + interval '13 hours',10,1,'J1','A2',5,NOW(),NOW() + interval '13 hours',NOW(),NOW());
+
+-- ==============================
+-- Booking (30 rows)
+-- ==============================
+INSERT INTO Booking (booking_id, flight_id, passenger_id, booking_platform, created_at, updated_at, status, ticket_price)
+VALUES
+(1,1,1,'Website',NOW(),NOW(),'Confirmed',4500.00),
+(2,2,2,'MobileApp',NOW(),NOW(),'Confirmed',3200.00),
+(3,3,3,'Agency',NOW(),NOW(),'Cancelled',28000.00),
+(4,4,4,'Website',NOW(),NOW(),'Confirmed',6000.00),
+(5,5,5,'MobileApp',NOW(),NOW(),'Confirmed',7200.00),
+(6,6,6,'Agency',NOW(),NOW(),'Confirmed',50000.00),
+(7,7,7,'Website',NOW(),NOW(),'Confirmed',4500.00),
+(8,8,8,'MobileApp',NOW(),NOW(),'Confirmed',3500.00),
+(9,9,9,'Agency',NOW(),NOW(),'Cancelled',20000.00),
+(10,10,10,'Website',NOW(),NOW(),'Confirmed',6500.00),
+(11,1,11,'Website',NOW(),NOW(),'Confirmed',4800.00),
+(12,2,12,'Agency',NOW(),NOW(),'Confirmed',30000.00),
+(13,3,13,'MobileApp',NOW(),NOW(),'Confirmed',4000.00),
+(14,4,14,'Website',NOW(),NOW(),'Confirmed',7000.00),
+(15,5,15,'Agency',NOW(),NOW(),'Cancelled',26000.00),
+(16,6,16,'MobileApp',NOW(),NOW(),'Confirmed',3300.00),
+(17,7,17,'Website',NOW(),NOW(),'Confirmed',5100.00),
+(18,8,18,'Agency',NOW(),NOW(),'Confirmed',44000.00),
+(19,9,19,'Website',NOW(),NOW(),'Confirmed',5500.00),
+(20,10,20,'MobileApp',NOW(),NOW(),'Confirmed',3900.00),
+(21,1,21,'Agency',NOW(),NOW(),'Confirmed',28000.00),
+(22,2,22,'Website',NOW(),NOW(),'Cancelled',3400.00),
+(23,3,23,'MobileApp',NOW(),NOW(),'Confirmed',4500.00),
+(24,4,24,'Agency',NOW(),NOW(),'Confirmed',37000.00),
+(25,5,25,'Website',NOW(),NOW(),'Confirmed',4900.00),
+(26,6,26,'MobileApp',NOW(),NOW(),'Confirmed',5100.00),
+(27,7,27,'Agency',NOW(),NOW(),'Confirmed',46000.00),
+(28,8,28,'Website',NOW(),NOW(),'Confirmed',5200.00),
+(29,9,29,'MobileApp',NOW(),NOW(),'Cancelled',3300.00),
+(30,10,30,'Agency',NOW(),NOW(),'Confirmed',61000.00);
+
+-- ==============================
+-- Boarding_pass (30 rows)
+-- ==============================
+INSERT INTO Boarding_pass (boarding_pass_id, booking_id, seat, boarding_time, created_at, updated_at)
+VALUES
+(1,1,'12A',NOW(),NOW(),NOW()),
+(2,2,'14B',NOW(),NOW(),NOW()),
+(3,3,'15C',NOW(),NOW(),NOW()),
+(4,4,'16D',NOW(),NOW(),NOW()),
+(5,5,'17E',NOW(),NOW(),NOW()),
+(6,6,'18F',NOW(),NOW(),NOW()),
+(7,7,'19A',NOW(),NOW(),NOW()),
+(8,8,'20B',NOW(),NOW(),NOW()),
+(9,9,'21C',NOW(),NOW(),NOW()),
+(10,10,'22D',NOW(),NOW(),NOW()),
+(11,11,'23E',NOW(),NOW(),NOW()),
+(12,12,'24F',NOW(),NOW(),NOW()),
+(13,13,'25A',NOW(),NOW(),NOW()),
+(14,14,'26B',NOW(),NOW(),NOW()),
+(15,15,'27C',NOW(),NOW(),NOW()),
+(16,16,'28D',NOW(),NOW(),NOW()),
+(17,17,'29E',NOW(),NOW(),NOW()),
+(18,18,'30F',NOW(),NOW(),NOW()),
+(19,19,'31A',NOW(),NOW(),NOW()),
+(20,20,'32B',NOW(),NOW(),NOW()),
+(21,21,'12C',NOW(),NOW(),NOW()),
+(22,22,'14D',NOW(),NOW(),NOW()),
+(23,23,'15E',NOW(),NOW(),NOW()),
+(24,24,'16F',NOW(),NOW(),NOW()),
+(25,25,'17A',NOW(),NOW(),NOW()),
+(26,26,'18B',NOW(),NOW(),NOW()),
+(27,27,'19C',NOW(),NOW(),NOW()),
+(28,28,'20D',NOW(),NOW(),NOW()),
+(29,29,'21E',NOW(),NOW(),NOW()),
+(30,30,'22F',NOW(),NOW(),NOW());
+
+-- ==============================
+-- Baggage (30 rows)
+-- ==============================
+INSERT INTO Baggage (baggage_id, weight_in_kg, created_at, updated_at, booking_id)
+VALUES
+(1,15.2,NOW(),NOW(),1),
+(2,18.5,NOW(),NOW(),2),
+(3,20.1,NOW(),NOW(),3),
+(4,12.3,NOW(),NOW(),4),
+(5,25.0,NOW(),NOW(),5),
+(6,19.4,NOW(),NOW(),6),
+(7,14.8,NOW(),NOW(),7),
+(8,21.6,NOW(),NOW(),8),
+(9,17.7,NOW(),NOW(),9),
+(10,22.9,NOW(),NOW(),10),
+(11,13.5,NOW(),NOW(),11),
+(12,16.4,NOW(),NOW(),12),
+(13,18.1,NOW(),NOW(),13),
+(14,15.9,NOW(),NOW(),14),
+(15,23.0,NOW(),NOW(),15),
+(16,19.2,NOW(),NOW(),16),
+(17,21.3,NOW(),NOW(),17),
+(18,22.4,NOW(),NOW(),18),
+(19,20.7,NOW(),NOW(),19),
+(20,14.1,NOW(),NOW(),20),
+(21,16.8,NOW(),NOW(),21),
+(22,18.9,NOW(),NOW(),22),
+(23,22.5,NOW(),NOW(),23),
+(24,19.6,NOW(),NOW(),24),
+(25,15.4,NOW(),NOW(),25),
+(26,21.1,NOW(),NOW(),26),
+(27,23.2,NOW(),NOW(),27),
+(28,20.3,NOW(),NOW(),28),
+(29,14.7,NOW(),NOW(),29),
+(30,16.2,NOW(),NOW(),30);
+
+-- ==============================
+-- Baggage_check (15 rows)
+-- ==============================
+INSERT INTO Baggage_check (baggage_check_id, check_result, created_at, updated_at, booking_id, passenger_id)
+VALUES
+(1,'Cleared',NOW(),NOW(),1,1),
+(2,'Cleared',NOW(),NOW(),2,2),
+(3,'Suspicious',NOW(),NOW(),3,3),
+(4,'Cleared',NOW(),NOW(),4,4),
+(5,'Cleared',NOW(),NOW(),5,5),
+(6,'Cleared',NOW(),NOW(),6,6),
+(7,'Suspicious',NOW(),NOW(),7,7),
+(8,'Cleared',NOW(),NOW(),8,8),
+(9,'Cleared',NOW(),NOW(),9,9),
+(10,'Cleared',NOW(),NOW(),10,10),
+(11,'Cleared',NOW(),NOW(),11,11),
+(12,'Suspicious',NOW(),NOW(),12,12),
+(13,'Cleared',NOW(),NOW(),13,13),
+(14,'Cleared',NOW(),NOW(),14,14),
+(15,'Cleared',NOW(),NOW(),15,15);
+
+-- ==============================
+-- Booking_flight (30 rows)
+-- ==============================
+INSERT INTO Booking_flight (booking_flight_id, booking_id, flight_id, created_at, updated_at)
+VALUES
+(1,1,1,NOW(),NOW()),
+(2,2,2,NOW(),NOW()),
+(3,3,3,NOW(),NOW()),
+(4,4,4,NOW(),NOW()),
+(5,5,5,NOW(),NOW()),
+(6,6,6,NOW(),NOW()),
+(7,7,7,NOW(),NOW()),
+(8,8,8,NOW(),NOW()),
+(9,9,9,NOW(),NOW()),
+(10,10,10,NOW(),NOW()),
+(11,11,1,NOW(),NOW()),
+(12,12,2,NOW(),NOW()),
+(13,13,3,NOW(),NOW()),
+(14,14,4,NOW(),NOW()),
+(15,15,5,NOW(),NOW()),
+(16,16,6,NOW(),NOW()),
+(17,17,7,NOW(),NOW()),
+(18,18,8,NOW(),NOW()),
+(19,19,9,NOW(),NOW()),
+(20,20,10,NOW(),NOW()),
+(21,21,1,NOW(),NOW()),
+(22,22,2,NOW(),NOW()),
+(23,23,3,NOW(),NOW()),
+(24,24,4,NOW(),NOW()),
+(25,25,5,NOW(),NOW()),
+(26,26,6,NOW(),NOW()),
+(27,27,7,NOW(),NOW()),
+(28,28,8,NOW(),NOW()),
+(29,29,9,NOW(),NOW()),
+(30,30,10,NOW(),NOW());
+
+-- ==============================
+-- Security_check (10 rows)
+-- ==============================
+INSERT INTO Security_check (security_check_id, check_result, created_at, updated_at, passenger_id)
+VALUES
+(1,'Cleared',NOW(),NOW(),1),
+(2,'Cleared',NOW(),NOW(),2),
+(3,'Flagged',NOW(),NOW(),3),
+(4,'Cleared',NOW(),NOW(),4),
+(5,'Cleared',NOW(),NOW(),5),
+(6,'Cleared',NOW(),NOW(),6),
+(7,'Flagged',NOW(),NOW(),7),
+(8,'Cleared',NOW(),NOW(),8),
+(9,'Cleared',NOW(),NOW(),9),
+(10,'Cleared',NOW(),NOW(),10);
+
+--SELECT * FROM Passengers, Airline, Airport, Flights, Booking, Baggage_check, Baggage, Boarding_pass, Booking_flight, Security_check;
